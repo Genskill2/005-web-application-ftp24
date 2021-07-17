@@ -107,8 +107,9 @@ def edit(pid):
         # TODO Handle sold
         cursor.execute("""UPDATE pet SET description= ? WHERE id =?""",[description,pid])
         conn.commit()
-        if sold==1:
-            sold=date.today()
+        if sold:
+            today=date.today()
+            sold=today.strftime("%Y-%m-%d")
             cursor.execute("""UPDATE pet SET sold= ? WHERE id = ?""",[sold,pid])
             conn.commit()
         return redirect(url_for("pets.pet_info", pid=pid), 302)
