@@ -18,9 +18,16 @@ def format_date(d):
 
 @bp.route("/search/<field>/<value>")
 def search(field, value):
-    # TBD
-    return ""
+    conn=db.get_db()
+    cursor=conn.cursor()
+    cursor.execute("select id from tag where name= ? ",value)
+    tagids=cursor.fetchall()
+    # for tagid in tagids:
+        # cursor.execute(f"select p.id, p.name, p.bought, p.sold, p.species from pet p, tags_pets a where a.id={tagid}")
+    # pets=cursor.fetchall()
 
+    # return render_template('index.html', pets = pets)
+    return tagids
 @bp.route("/")
 def dashboard():
     conn = db.get_db()
@@ -98,7 +105,11 @@ def edit(pid):
         description = request.form.get('description')
         sold = request.form.get("sold")
         # TODO Handle sold
+        data1=dict(des=description,id=pid)
+        cursor.execute("""UPDATE pet SET description= ? WHERE id =?""",[description,pid])
+        conn.commit()
         if sold==1:
             sold=format_date(date.today())
-            cursor.execute("UPDATE pet SET sold= ? WHERE pid= ? ",sold,pid)
+            cursor.execute("""UPDATE pet SET sold= ? WHERE id = ?""",[sold,pid])
+            conn.commit()
         return redirect(url_for("pets.pet_info", pid=pid), 302)
